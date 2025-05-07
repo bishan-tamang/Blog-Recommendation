@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookmarks{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">My Bookmarks</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% if bookmarks %}
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    {% for bookmark in bookmarks %}
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                {% if bookmark.blog.featured_image %}
+                                    <img src="{{ bookmark.blog.featured_image.url }}" class="card-img-top" alt="{{ bookmark.blog.title }}">
+                                {% else %}
+                                    <img src="{% static 'images/default_blog.jpg' %}" class="card-img-top" alt="Default Blog Image">
+                                {% endif %}
+                                
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ bookmark.blog.title }}</h5>
+                                    <p class="card-text text-muted">
+                                        <small>
+                                            By {{ bookmark.blog.author.username }} | 
+                                            Bookmarked on {{ bookmark.created_at|date:"F j, Y" }}
+                                        </small>
+                                    </p>
+                                    <p class="card-text">{{ bookmark.blog.content|truncatewords:30 }}</p>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <a href="{% url 'blog_app:blog_detail' slug=bookmark.blog.slug %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                                            <form method="post" action="{% url 'blog_app:bookmark_blog' blog_id=bookmark.blog.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Remove Bookmark</button>
+                                            </form>
+                                        </div>
+                                        <div class="text-muted">
+                                            <small>
+                                                <i class="fas fa-eye"></i> {{ bookmark.blog.views_count }}
+                                                <i class="fas fa-heart ms-2"></i> {{ bookmark.blog.get_like_count }}
+                                                <i class="fas fa-comment ms-2"></i> {{ bookmark.blog.get_comment_count }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                {% if bookmarks.has_other_pages %}
+                    <nav class="mt-4" aria-label="Bookmark pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if bookmarks.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ bookmarks.previous_page_number }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                            {% endif %}
+
+                            {% for num in bookmarks.paginator.page_range %}
+                                {% if bookmarks.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if bookmarks.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ bookmarks.next_page_number }}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <h4 class="alert-heading">No Bookmarks Yet!</h4>
+                    <p>You haven't bookmarked any blogs yet. Start exploring our blogs and bookmark the ones you like to read later!</p>
+                    <hr>
+                    <a href="{% url 'blog_app:blog_list' %}" class="btn btn-primary">Explore Blogs</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .btn-group .btn {
+        margin-right: 5px;
+    }
+    
+    .card-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+</style>
+{% endblock %}
+{% endblock %} 

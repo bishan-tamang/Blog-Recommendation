@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Blog List{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Filter Sidebar -->
+    <div class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Filter Blogs</h5>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'blog_app:filter_blogs' %}" method="GET">
+                    {% if query %}
+                        <input type="hidden" name="q" value="{{ query }}">
+                    {% endif %}
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if selected_category|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sort By</label>
+                        <select name="sort" class="form-select">
+                            <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Newest First</option>
+                            <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Oldest First</option>
+                            <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Viewed</option>
+                            <option value="most_liked" {% if sort_by == 'most_liked' %}selected{% endif %}>Most Liked</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blog List -->
+    <div class="col-md-9">
+        <!-- Sports Section -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="sports-heading">Sports</h2>
+                {% if sports_category %}
+                <a href="{% url 'blog_app:category_detail' slug=sports_category.slug %}" class="btn btn-outline-primary">Explore More</a>
+                {% endif %}
+            </div>
+            
+            {% if sports_blogs %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for blog in sports_blogs %}
+                <div class="col">
+                    <div class="card h-100 blog-card">
+                        {% if blog.featured_image %}
+                            <img src="{{ blog.featured_image.url }}" class="card-img-top" alt="{{ blog.title }}">
+                        {% else %}
+                            <img src="{% static 'images/default_blog.jpg' %}" class="card-img-top" alt="Default Blog Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ blog.title }}</h5>
+                            <p class="card-text text-muted">
+                                <small>
+                                    By {{ blog.author.username }} | 
+                                    {{ blog.created_at|date:"M d, Y" }}
+                                </small>
+                            </p>
+                            <p class="card-text">{{ blog.content|truncatewords:30 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-eye"></i> {{ blog.views_count }}
+                                    <i class="fas fa-heart ms-2"></i> {{ blog.get_like_count }}
+                                    <i class="fas fa-comment ms-2"></i> {{ blog.get_comment_count }}
+                                </div>
+                                <a href="{% url 'blog_app:blog_detail' slug=blog.slug %}" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No sports blogs available. Add some from the admin panel.
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Health & Fitness Section -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="health-fitness-heading">Health & Fitness</h2>
+                {% if health_fitness_category %}
+                <a href="{% url 'blog_app:category_detail' slug=health_fitness_category.slug %}" class="btn btn-outline-success">Explore More</a>
+                {% endif %}
+            </div>
+            
+            {% if health_fitness_blogs %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for blog in health_fitness_blogs %}
+                <div class="col">
+                    <div class="card h-100 blog-card">
+                        {% if blog.featured_image %}
+                            <img src="{{ blog.featured_image.url }}" class="card-img-top" alt="{{ blog.title }}">
+                        {% else %}
+                            <img src="{% static 'images/default_blog.jpg' %}" class="card-img-top" alt="Default Blog Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ blog.title }}</h5>
+                            <p class="card-text text-muted">
+                                <small>
+                                    By {{ blog.author.username }} | 
+                                    {{ blog.created_at|date:"M d, Y" }}
+                                </small>
+                            </p>
+                            <p class="card-text">{{ blog.content|truncatewords:30 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-eye"></i> {{ blog.views_count }}
+                                    <i class="fas fa-heart ms-2"></i> {{ blog.get_like_count }}
+                                    <i class="fas fa-comment ms-2"></i> {{ blog.get_comment_count }}
+                                </div>
+                                <a href="{% url 'blog_app:blog_detail' slug=blog.slug %}" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No health & fitness blogs available. Add some from the admin panel.
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Career Section -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="career-heading">Career</h2>
+                {% if career_category %}
+                <a href="{% url 'blog_app:category_detail' slug=career_category.slug %}" class="btn btn-outline-danger">Explore More</a>
+                {% endif %}
+            </div>
+            
+            {% if career_blogs %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for blog in career_blogs %}
+                <div class="col">
+                    <div class="card h-100 blog-card">
+                        {% if blog.featured_image %}
+                            <img src="{{ blog.featured_image.url }}" class="card-img-top" alt="{{ blog.title }}">
+                        {% else %}
+                            <img src="{% static 'images/default_blog.jpg' %}" class="card-img-top" alt="Default Blog Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ blog.title }}</h5>
+                            <p class="card-text text-muted">
+                                <small>
+                                    By {{ blog.author.username }} | 
+                                    {{ blog.created_at|date:"M d, Y" }}
+                                </small>
+                            </p>
+                            <p class="card-text">{{ blog.content|truncatewords:30 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-eye"></i> {{ blog.views_count }}
+                                    <i class="fas fa-heart ms-2"></i> {{ blog.get_like_count }}
+                                    <i class="fas fa-comment ms-2"></i> {{ blog.get_comment_count }}
+                                </div>
+                                <a href="{% url 'blog_app:blog_detail' slug=blog.slug %}" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No career blogs available. Add some from the admin panel.
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Self-Improvement Section -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="self-improvement-heading">Self-Improvement</h2>
+                {% if self_improvement_category %}
+                <a href="{% url 'blog_app:category_detail' slug=self_improvement_category.slug %}" class="btn btn-outline-info">Explore More</a>
+                {% endif %}
+            </div>
+            
+            {% if self_improvement_blogs %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for blog in self_improvement_blogs %}
+                <div class="col">
+                    <div class="card h-100 blog-card">
+                        {% if blog.featured_image %}
+                            <img src="{{ blog.featured_image.url }}" class="card-img-top" alt="{{ blog.title }}">
+                        {% else %}
+                            <img src="{% static 'images/default_blog.jpg' %}" class="card-img-top" alt="Default Blog Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ blog.title }}</h5>
+                            <p class="card-text text-muted">
+                                <small>
+                                    By {{ blog.author.username }} | 
+                                    {{ blog.created_at|date:"M d, Y" }}
+                                </small>
+                            </p>
+                            <p class="card-text">{{ blog.content|truncatewords:30 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-eye"></i> {{ blog.views_count }}
+                                    <i class="fas fa-heart ms-2"></i> {{ blog.get_like_count }}
+                                    <i class="fas fa-comment ms-2"></i> {{ blog.get_comment_count }}
+                                </div>
+                                <a href="{% url 'blog_app:blog_detail' slug=blog.slug %}" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No self-improvement blogs available. Add some from the admin panel.
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Education Section -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="education-heading">Education</h2>
+                {% if education_category %}
+                <a href="{% url 'blog_app:category_detail' slug=education_category.slug %}" class="btn btn-outline-warning">Explore More</a>
+                {% endif %}
+            </div>
+            
+            {% if education_blogs %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for blog in education_blogs %}
+                <div class="col">
+                    <div class="card h-100 blog-card">
+                        {% if blog.featured_image %}
+                            <img src="{{ blog.featured_image.url }}" class="card-img-top" alt="{{ blog.title }}">
+                        {% else %}
+                            <img src="{% static 'images/default_blog.jpg' %}" class="card-img-top" alt="Default Blog Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ blog.title }}</h5>
+                            <p class="card-text text-muted">
+                                <small>
+                                    By {{ blog.author.username }} | 
+                                    {{ blog.created_at|date:"M d, Y" }}
+                                </small>
+                            </p>
+                            <p class="card-text">{{ blog.content|truncatewords:30 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-eye"></i> {{ blog.views_count }}
+                                    <i class="fas fa-heart ms-2"></i> {{ blog.get_like_count }}
+                                    <i class="fas fa-comment ms-2"></i> {{ blog.get_comment_count }}
+                                </div>
+                                <a href="{% url 'blog_app:blog_detail' slug=blog.slug %}" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No education blogs available. Add some from the admin panel.
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if query %}
+            <div class="mb-4">
+                <h2>Search Results for "{{ query }}"</h2>
+                <p class="text-muted">Found {{ blogs.count }} results</p>
+            </div>
+        {% endif %}
+        
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            {% for blog in blogs %}
+                <div class="col">
+                    <div class="card h-100 blog-card">
+                        {% if blog.featured_image %}
+                            <img src="{{ blog.featured_image.url }}" class="card-img-top" alt="{{ blog.title }}">
+                        {% else %}
+                            <img src="{% static 'images/default_blog.jpg' %}" class="card-img-top" alt="Default Blog Image">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ blog.title }}</h5>
+                            <p class="card-text text-muted">
+                                <small>
+                                    By {{ blog.author.username }} | 
+                                    {{ blog.created_at|date:"M d, Y" }}
+                                </small>
+                            </p>
+                            <p class="card-text">{{ blog.content|truncatewords:30 }}</p>
+                            <div class="mb-2">
+                                {% for category in blog.categories.all %}
+                                    <span class="category-badge">{{ category.name }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-eye"></i> {{ blog.views_count }}
+                                    <i class="fas fa-heart ms-2"></i> {{ blog.get_like_count }}
+                                    <i class="fas fa-comment ms-2"></i> {{ blog.get_comment_count }}
+                                </div>
+                                <a href="{% url 'blog_app:blog_detail' slug=blog.slug %}" class="btn btn-primary">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        {% if query %}
+                            <h4 class="alert-heading">No Results Found</h4>
+                            <p>No blogs found matching "{{ query }}". Try:</p>
+                            <ul>
+                                <li>Using different keywords</li>
+                                <li>Checking for typos</li>
+                                <li>Using more general terms</li>
+                            </ul>
+                        {% else %}
+                            <h4 class="alert-heading">No Blogs Available</h4>
+                            <p>There are no blogs in the system yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">Last &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

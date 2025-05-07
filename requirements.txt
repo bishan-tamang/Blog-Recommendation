@@ -1,0 +1,11 @@
+Django>=5.0.1
+Pillow>=10.1.0  # For image handling
+django-crispy-forms>=2.1  # For better form rendering
+django-allauth>=0.60.0  # For enhanced authentication
+django-filter>=23.5  # For filtering functionality
+django-taggit>=5.0.1  # For tagging functionality
+django-notifications-hq>=1.8.3  # For handling notifications
+django-bootstrap5>=23.3  # For Bootstrap 5 integration
+whitenoise>=6.6.0  # For serving static files
+python-dotenv>=1.0.0  # For environment variables
+django-cleanup>=8.0.0  # For automatic file cleanup 

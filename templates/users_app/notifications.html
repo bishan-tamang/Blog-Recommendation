@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>My Notifications</h2>
+                <form method="post" action="{% url 'users_app:mark_notifications_read' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-check-double"></i> Mark All as Read
+                    </button>
+                </form>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if notifications %}
+                <div class="card shadow-sm">
+                    <ul class="list-group list-group-flush">
+                        {% for notification in notifications %}
+                            <li class="list-group-item {% if not notification.is_read %}notification-unread{% endif %}">
+                                <div class="d-flex align-items-center">
+                                    <!-- Notification Icon -->
+                                    <div class="notification-icon me-3">
+                                        {% if notification.notification_type == 'new_blog' %}
+                                            <i class="fas fa-newspaper text-primary fa-lg"></i>
+                                        {% elif notification.notification_type == 'comment' %}
+                                            <i class="fas fa-comment text-success fa-lg"></i>
+                                        {% elif notification.notification_type == 'like' %}
+                                            <i class="fas fa-heart text-danger fa-lg"></i>
+                                        {% elif notification.notification_type == 'recommendation' %}
+                                            <i class="fas fa-star text-warning fa-lg"></i>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Notification Content -->
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <p class="mb-1">{{ notification.message }}</p>
+                                            <small class="text-muted ms-2">{{ notification.created_at|timesince }} ago</small>
+                                        </div>
+                                        {% if notification.blog %}
+                                            <a href="{% url 'blog_app:blog_detail' slug=notification.blog.slug %}" class="btn btn-sm btn-link px-0">
+                                                View Blog <i class="fas fa-chevron-right fa-xs"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {% if notifications.has_other_pages %}
+                    <nav class="mt-4" aria-label="Notification pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if notifications.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.previous_page_number }}">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                            {% endif %}
+
+                            {% for num in notifications.paginator.page_range %}
+                                {% if notifications.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if notifications.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ notifications.next_page_number }}">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-bell-slash text-muted fa-3x mb-3"></i>
+                        <h4>No Notifications</h4>
+                        <p class="text-muted mb-0">You don't have any notifications at the moment.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .notification-unread {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .list-group-item {
+        padding: 1rem;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    
+    .btn-link {
+        text-decoration: none;
+        padding-left: 0;
+    }
+    
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+{% endblock %} 

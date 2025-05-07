@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" class="rounded-circle mb-3" alt="Profile Picture" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'images/default_profile.jpg' %}" class="rounded-circle mb-3" alt="Default Profile Picture" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% endif %}
+                    <h3 class="card-title">{{ user.get_full_name|default:user.username }}</h3>
+                    <p class="text-muted">@{{ user.username }}</p>
+                    <p class="card-text">{{ profile.bio|default:"No bio added yet." }}</p>
+                    <p class="text-muted">
+                        <small>Member since {{ user.date_joined|date:"F j, Y" }}</small>
+                    </p>
+                    <a href="{% url 'users_app:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Section -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Your Activity</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <h5>0</h5>
+                            <p class="text-muted">Blogs Read</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <h5>{{ user.likes.count }}</h5>
+                            <p class="text-muted">Likes Given</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <h5>{{ user.comments.count }}</h5>
+                            <p class="text-muted">Comments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
